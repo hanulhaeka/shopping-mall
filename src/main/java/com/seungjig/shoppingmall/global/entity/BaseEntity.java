@@ -1,4 +1,4 @@
-package com.seungjig.shoppingmall.global;
+package com.seungjig.shoppingmall.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
