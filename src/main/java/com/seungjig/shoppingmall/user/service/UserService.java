@@ -34,6 +34,10 @@ public class UserService {
 
         String hashed = passwordEncoder.encode(signupDto.getPassword());
 
+        if (signupDto.getPhoneNumber() != null && signupDto.getPhoneNumber().isBlank()) {
+            signupDto.setPhoneNumber(null);
+        }
+
         User user = new User(signupDto.getLoginId(), hashed, signupDto.getName(), signupDto.getPhoneNumber(),
                 Role.USER, UserStatus.ACTIVE);
 
