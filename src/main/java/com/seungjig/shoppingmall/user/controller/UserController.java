@@ -47,4 +47,10 @@ public class UserController {
 
         return "redirect:/";
     }
+
+    // 로그인 폼 전송
+    @GetMapping("/signin")
+    public String loginPage() {
+        return "user/signin";
+    }
 }
