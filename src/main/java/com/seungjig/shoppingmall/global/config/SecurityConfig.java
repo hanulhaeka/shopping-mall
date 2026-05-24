@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/", "/users/signup", "/index.html", "/users/signin", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/users/signup", "/index.html", "/users/signin", "/favicon.ico", "/users/logout").permitAll()
                         .anyRequest().authenticated()
                 )
 
@@ -31,6 +31,13 @@ public class SecurityConfig {
                         .loginPage("/users/signin")
                         .loginProcessingUrl("/users/signin")
                         .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/users/logout")
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
 
