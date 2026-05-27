@@ -89,15 +89,16 @@
 | --- | ---------------- | -------------- | ------------ | --- | --- | ---- | ----------------- | --- | ---------------------------------------------------------- |
 | 1   | 상품ID           | id             | BIGINT       | O   |     | N    | AUTO_INCREMENT    | O   | 상품 정보의 고유 식별자 (대리키)                           |
 | 2   | 상품명           | name           | VARCHAR(100) |     |     | N    |                   |     | 상품 이름                                                  |
-| 3   | 재고             | stock          | INT          |     |     | N    |                   |     | 상품의 재고                                                |
-| 4   | 상품 설명        | description    | TEXT         |     |     | Y    |                   |     | 상품에 대한 상세한 설명                                    |
-| 5   | 상품 상태        | status         | VARCHAR(30)  |     |     | N    | ‘ACTIVE’          |     | 재고 부족, 상품 삭제 등에 경우에 따라 상태 변경            |
-| 6   | 대표 이미지 주소 | image_head_url | VARCHAR(500) |     |     | N    |                   |     | 상품 목록 등에서 보여줄 상품의 대표 이미지 URL 주소        |
-| 7   | 이미지1 주소     | image1_url     | VARCHAR(500) |     |     | Y    |                   |     | 상품 설명을 이미지 파일로 보여주기 위한 첫번째 이미지 주소 |
-| 8   | 이미지2 주소     | image2_url     | VARCHAR(500) |     |     | Y    |                   |     | 상품 설명을 이미지 파일로 보여주기 위한 두번째 이미지 주소 |
-| 9   | 이미지3 주소     | image3_url     | VARCHAR(500) |     |     | Y    |                   |     | 상품 설명을 이미지 파일로 보여주기 위한 세번째 이미지 주소 |
-| 10  | 생성일           | created_at     | TIMESTAMP    |     |     | N    | CURRENT_TIMESTAMP |     | 상품이 등록된 시각 저장                                    |
-| 11  | 수정일           | updated_at     | TIMESTAMP    |     |     | Y    | CURRENT_TIMESTAMP |     | 상품 정보가 수정된 시각 저장                               |
+| 3   | 상품 가격        | price          | INT          |     |     | N    |                   |     | 상품 가격                                                  |
+| 4   | 재고             | stock          | INT          |     |     | N    |                   |     | 상품의 재고                                                |
+| 5   | 상품 설명        | description    | TEXT         |     |     | Y    |                   |     | 상품에 대한 상세한 설명                                    |
+| 6   | 상품 상태        | status         | VARCHAR(30)  |     |     | N    | ‘ACTIVE’          |     | 재고 부족, 상품 삭제 등에 경우에 따라 상태 변경            |
+| 7   | 대표 이미지 주소 | image_head_url | VARCHAR(500) |     |     | N    |                   |     | 상품 목록 등에서 보여줄 상품의 대표 이미지 URL 주소        |
+| 8   | 이미지1 주소     | image1_url     | VARCHAR(500) |     |     | Y    |                   |     | 상품 설명을 이미지 파일로 보여주기 위한 첫번째 이미지 주소 |
+| 9   | 이미지2 주소     | image2_url     | VARCHAR(500) |     |     | Y    |                   |     | 상품 설명을 이미지 파일로 보여주기 위한 두번째 이미지 주소 |
+| 10  | 이미지3 주소     | image3_url     | VARCHAR(500) |     |     | Y    |                   |     | 상품 설명을 이미지 파일로 보여주기 위한 세번째 이미지 주소 |
+| 11  | 생성일           | created_at     | TIMESTAMP    |     |     | N    | CURRENT_TIMESTAMP |     | 상품이 등록된 시각 저장                                    |
+| 12  | 수정일           | updated_at     | TIMESTAMP    |     |     | Y    | CURRENT_TIMESTAMP |     | 상품 정보가 수정된 시각 저장                               |
 
 ## Carts
 
@@ -140,3 +141,7 @@
 
 1. 생성일 컬럼이 있는 모든 테이블에 생성일 컬럼의 NULL 허용을 NOT NULL로 변경
 2. 구현에서 BaseEntity 사용으로 개발 편의성을 위해 생성일만 있던 테이블에 수정일 컬럼 추가
+
+2026-05-27
+
+1. product 테이블에 price 컬럼 추가
