@@ -3,12 +3,24 @@ package com.seungjig.shoppingmall.product.entity;
 import com.seungjig.shoppingmall.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name="products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
+
+
+    public Product(String name, Integer price, Integer stock, ProductStatus status) {
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.status = status;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

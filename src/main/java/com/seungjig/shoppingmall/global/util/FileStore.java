@@ -54,7 +54,7 @@ public class FileStore {
         if (multipartFile == null || multipartFile.isEmpty()) {
             return false;
         }
-        
+
         String contentType = multipartFile.getContentType();
         if (contentType != null && contentType.startsWith("image/")) {
             return true;
