@@ -31,12 +31,11 @@ public class ProductController {
     @PostMapping("/create")
     public String createProduct(@Validated @ModelAttribute("productCreateDto") ProductCreateDto productCreateDto, BindingResult bindingResult) throws IOException {
 
-        if (bindingResult.hasErrors()) {
-            return "product/create";
-        }
-
         if (productCreateDto.getImageHead() == null || productCreateDto.getImageHead().isEmpty()) {
             bindingResult.rejectValue("imageHead", "NotHaveNeededFile", "필수 제출 파일이 없습니다.");
+        }
+
+        if (bindingResult.hasErrors()) {
             return "product/create";
         }
 
