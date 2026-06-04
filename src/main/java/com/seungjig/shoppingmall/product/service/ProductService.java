@@ -3,10 +3,13 @@ package com.seungjig.shoppingmall.product.service;
 import com.seungjig.shoppingmall.global.util.FileStore;
 import com.seungjig.shoppingmall.product.entity.Product;
 import com.seungjig.shoppingmall.product.entity.ProductStatus;
+import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
 import com.seungjig.shoppingmall.product.exception.NotCorrectFileTypeException;
 import com.seungjig.shoppingmall.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +42,20 @@ public class ProductService {
         optionalImageProcess(productCreateDto.getImage3(), product::setImage3Url);
 
         productRepository.save(product);
+    }
+
+    // 관리자 상품 목록 리스트
+    @Transactional(readOnly = true)
+    public Page<AdminProductListDto> getAdminProductList(Pageable pageable) {
+        return productRepository.findAll(pageable).map(this::mapToAdminProductListDto);
+    }
+
+    private AdminProductListDto mapToAdminProductListDto(Product product) {
+        AdminProductListDto adminProductListDto = new AdminProductListDto();
+        adminProductListDto.setId(product.getId());
+        adminProductListDto.setName(product.getName());
+
+        return adminProductListDto;
     }
 
     private void optionalImageProcess(MultipartFile multipartFile, Consumer<String> imageSetter) throws IOException {
