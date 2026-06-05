@@ -54,6 +54,9 @@ public class ProductService {
         AdminProductListDto adminProductListDto = new AdminProductListDto();
         adminProductListDto.setId(product.getId());
         adminProductListDto.setName(product.getName());
+        adminProductListDto.setPrice(product.getPrice());
+        adminProductListDto.setStock(product.getStock());
+        adminProductListDto.setStatus(product.getStatus());
 
         return adminProductListDto;
     }
