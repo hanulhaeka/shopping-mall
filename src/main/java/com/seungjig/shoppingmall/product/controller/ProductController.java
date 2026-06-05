@@ -1,10 +1,15 @@
 package com.seungjig.shoppingmall.product.controller;
 
+import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
 import com.seungjig.shoppingmall.product.exception.NotCorrectFileTypeException;
 import com.seungjig.shoppingmall.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +52,15 @@ public class ProductController {
         }
 
         return "redirect:/";
+    }
+
+    // 관리자 상품 목록 조회
+    @GetMapping("/admin/list")
+    public String getAdminProductList(@PageableDefault(page = 0, size = 10) Pageable pageable, Model model) {
+        Page<AdminProductListDto> page = productService.getAdminProductList(pageable);
+        model.addAttribute("page", page);
+
+        return "product/admin-product-list";
     }
 
 }

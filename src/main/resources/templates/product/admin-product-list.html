@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상품 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+<h1 class="title text-center mb-3 mt-5">Shopping Mall</h1>
+<div class="d-flex justify-content-between border-bottom border-3 pb-2 mb-3">
+    <div class="ms-3">
+        <a class="text-decoration-none text-reset me-1" href="/products/create">상품 등록</a>
+        <a class="text-decoration-none text-reset" href="/products/admin/list">상품 목록</a>
+    </div>
+    <a class="text-decoration-none text-reset me-3" href="/logout">로그아웃</a>
+</div>
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <table class="table w-75">
+        <tr>
+            <th>번호</th>
+            <th>상품명</th>
+            <th>가격</th>
+            <th>재고</th>
+            <th>상태</th>
+            <th>수정/삭제</th>
+        </tr>
+        <tr class="align-middle" th:each="productDto, productStat : ${page.content}">
+            <td  th:text="${productStat.count}"></td>
+            <td>
+                <a class="text-decoration-none text-reset" th:href="@{/products/content/{id}(id=${productDto.id})}" th:text="${productDto.name}">name</a>
+            </td>
+            <td th:text="${productDto.price}">price</td>
+            <td th:text="${productDto.stock}">stock</td>
+            <td th:text="${productDto.status.name() == 'ACTIVE' ? '판매중' : '판매 종료'}">status</td>
+            <td>
+                <a class="btn btn-success" th:href="@{/products/update/{id}(id=${productDto.id})}">수정</a>
+                <a class="btn btn-danger" th:href="@{/products/delete/{id}(id=${productDto.id})}">삭제</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div th:if="${!page.isEmpty()}" class="d-flex justify-content-center mt-4"
+     th:with="
+        startNumber=${(page.number / 5) * 5 + 1},
+        endNumber=${(startNumber + 4 < page.totalPages) ? startNumber + 4 : page.totalPages}
+     ">
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/products/admin/list(page=0)}" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+
+            <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled'">
+                <a class="page-link" th:href="@{/products/admin/list(page=${page.number - 1})}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <li class="page-item"
+                th:each="pageNo : ${#numbers.sequence(startNumber, endNumber)}"
+                th:classappend="${pageNo - 1 == page.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/products/admin/list(page=${pageNo - 1})}"
+                   th:text="${pageNo}">1</a>
+            </li>
+
+            <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled'">
+                <a class="page-link" th:href="@{/products/admin/list(page=${page.number + 1})}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/products/admin/list(page=${page.totalPages - 1})}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>
+</body>
+</html>
