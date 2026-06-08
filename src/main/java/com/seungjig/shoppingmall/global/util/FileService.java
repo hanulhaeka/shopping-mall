@@ -6,12 +6,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.UUID;
 
 @Component
-public class FileStore {
+public class FileService {
 
     @Value("${file.dir}")
     private String fileDir;
@@ -20,6 +22,7 @@ public class FileStore {
         return Paths.get(fileDir + fileUrl).toString();
     }
 
+    // 파일 저장
     public String storeFile(MultipartFile multipartFile) throws IOException {
 
         if (multipartFile.isEmpty()) {
@@ -31,6 +34,22 @@ public class FileStore {
         multipartFile.transferTo(new File(getFullPath(storeFileName)));
 
         return storeFileName;
+    }
+
+    //파일 삭제
+    public boolean deleteFile(String storeFileName) {
+        if (storeFileName == null || storeFileName.isEmpty()) {
+            return false;
+        }
+
+        String fullPath = getFullPath(storeFileName);
+        Path path = Paths.get(fullPath);
+
+        try {
+            return Files.deleteIfExists(path);
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private String createStoreFileName(String originalFilename) {
