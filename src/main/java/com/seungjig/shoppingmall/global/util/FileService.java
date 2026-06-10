@@ -18,7 +18,7 @@ public class FileService {
     @Value("${file.dir}")
     private String fileDir;
 
-    private String getFullPath(String fileUrl) {
+    public String getFullPath(String fileUrl) {
         return Paths.get(fileDir + fileUrl).toString();
     }
 
