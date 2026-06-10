@@ -77,9 +77,17 @@ public class ProductService {
         updateProductImage(productUpdateDto.getIsImage3Deleted(), productUpdateDto.getImage3(), product.getImage3Url(), product::setImage3Url);
     }
 
-    private void updateProductImage(boolean isDeleted, MultipartFile newImageFile, String currentImageUrl, Consumer<String> imageSetter) throws IOException {
+    // 상품 수정 dto 반환
+    @Transactional
+    public ProductUpdateDto getProductUpdateDto(Long productId) {
+        return mapToProductUpdateDto(productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다.")));
+    }
 
-        if (isDeleted) {
+    private void updateProductImage(Boolean isDeleted, MultipartFile newImageFile, String currentImageUrl, Consumer<String> imageSetter) throws IOException {
+
+        boolean safeIsDeleted = Boolean.TRUE.equals(isDeleted);
+
+        if (safeIsDeleted) {
             fileService.deleteFile(currentImageUrl);
             imageSetter.accept(null);
         } else if (fileService.isImageFile(newImageFile)) {
@@ -99,6 +107,23 @@ public class ProductService {
         adminProductListDto.setStatus(product.getStatus());
 
         return adminProductListDto;
+    }
+
+    private ProductUpdateDto mapToProductUpdateDto(Product product) {
+        ProductUpdateDto productUpdateDto = new ProductUpdateDto();
+
+        productUpdateDto.setId(product.getId());
+        productUpdateDto.setName(product.getName());
+        productUpdateDto.setPrice(product.getPrice());
+        productUpdateDto.setStock(product.getStock());
+        productUpdateDto.setStatus(product.getStatus());
+
+        productUpdateDto.setImageHeadUrl(fileService.getFullPath(productUpdateDto.getImageHeadUrl()));
+        if (product.getImage1Url() != null) productUpdateDto.setImage1Url(fileService.getFullPath(product.getImage1Url()));
+        if (product.getImage2Url() != null) productUpdateDto.setImage2Url(fileService.getFullPath(product.getImage2Url()));
+        if (product.getImage3Url() != null) productUpdateDto.setImage3Url(fileService.getFullPath(product.getImage3Url()));
+
+        return productUpdateDto;
     }
 
     private void optionalImageProcess(MultipartFile multipartFile, Consumer<String> imageSetter) throws IOException {
