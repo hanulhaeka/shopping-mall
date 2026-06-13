@@ -118,10 +118,10 @@ public class ProductService {
         productUpdateDto.setStock(product.getStock());
         productUpdateDto.setStatus(product.getStatus());
 
-        productUpdateDto.setImageHeadUrl(fileService.getFullPath(product.getImageHeadUrl()));
-        if (product.getImage1Url() != null) productUpdateDto.setImage1Url(fileService.getFullPath(product.getImage1Url()));
-        if (product.getImage2Url() != null) productUpdateDto.setImage2Url(fileService.getFullPath(product.getImage2Url()));
-        if (product.getImage3Url() != null) productUpdateDto.setImage3Url(fileService.getFullPath(product.getImage3Url()));
+        productUpdateDto.setImageHeadUrl("/productImage/" + product.getImageHeadUrl());
+        if (product.getImage1Url() != null) productUpdateDto.setImage1Url("/productImage/" + product.getImage1Url());
+        if (product.getImage2Url() != null) productUpdateDto.setImage2Url("/productImage/" + product.getImage2Url());
+        if (product.getImage3Url() != null) productUpdateDto.setImage3Url("/productImage/" + product.getImage3Url());
 
         return productUpdateDto;
     }
