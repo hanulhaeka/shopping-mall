@@ -1,6 +1,7 @@
 package com.seungjig.shoppingmall.product.controller;
 
 import com.seungjig.shoppingmall.global.util.FileService;
+import com.seungjig.shoppingmall.product.entity.ProductStatus;
 import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductUpdateDto;
@@ -26,6 +27,11 @@ public class ProductController {
 
     private final ProductService productService;
     private final FileService fileService;
+
+    @ModelAttribute("productStatuses")
+    public ProductStatus[] productStatuses() {
+        return ProductStatus.values();
+    }
 
     // 상품 등록 폼 전송
     @GetMapping("/create")
