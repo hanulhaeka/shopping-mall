@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/", "/users/signup", "/index.html", "/users/signin", "/favicon.ico", "/users/logout").permitAll()
-                        .requestMatchers("/products/create").hasRole("ADMIN")
+                        .requestMatchers("/products/create", "/products/admin/list", "/products/update", "/products/update/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 
