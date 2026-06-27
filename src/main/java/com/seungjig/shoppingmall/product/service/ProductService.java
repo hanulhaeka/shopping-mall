@@ -1,10 +1,11 @@
 package com.seungjig.shoppingmall.product.service;
 
-import com.seungjig.shoppingmall.global.util.FileStore;
+import com.seungjig.shoppingmall.global.util.FileService;
 import com.seungjig.shoppingmall.product.entity.Product;
 import com.seungjig.shoppingmall.product.entity.ProductStatus;
 import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
+import com.seungjig.shoppingmall.product.entity.dto.ProductUpdateDto;
 import com.seungjig.shoppingmall.product.exception.NotCorrectFileTypeException;
 import com.seungjig.shoppingmall.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final FileStore fileStore;
+    private final FileService fileService;
 
     // 상품 등록
     @Transactional
@@ -30,8 +31,8 @@ public class ProductService {
 
         Product product = new Product(productCreateDto.getName(), productCreateDto.getPrice(), productCreateDto.getStock(), ProductStatus.ACTIVE);
 
-        if (fileStore.isImageFile(productCreateDto.getImageHead())) {
-            String imageHeadStore = fileStore.storeFile(productCreateDto.getImageHead());
+        if (fileService.isImageFile(productCreateDto.getImageHead())) {
+            String imageHeadStore = fileService.storeFile(productCreateDto.getImageHead());
             product.setImageHeadUrl(imageHeadStore);
         } else {
             throw new NotCorrectFileTypeException("이미지 파일이 아닙니다.");
@@ -50,6 +51,53 @@ public class ProductService {
         return productRepository.findAll(pageable).map(this::mapToAdminProductListDto);
     }
 
+
+    // 상품 수정
+    @Transactional
+    public void updateProduct(ProductUpdateDto productUpdateDto) throws IOException {
+
+        Product product = productRepository.findById(productUpdateDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+        product.setName(productUpdateDto.getName());
+        product.setPrice(productUpdateDto.getPrice());
+        product.setStock(productUpdateDto.getStock());
+        product.setStatus(productUpdateDto.getStatus());
+
+        if (productUpdateDto.getImageHead() != null && !productUpdateDto.getImageHead().isEmpty()) {
+            // 저장소에 있는 기존 이미지 삭제
+            fileService.deleteFile(product.getImageHeadUrl());
+            // 새 이미지 저장하고 저장 파일명 수정
+            String storeFile = fileService.storeFile(productUpdateDto.getImageHead());
+            product.setImageHeadUrl(storeFile);
+        }
+
+        updateProductImage(productUpdateDto.getIsImage1Deleted(), productUpdateDto.getImage1(), product.getImage1Url(), product::setImage1Url);
+        updateProductImage(productUpdateDto.getIsImage2Deleted(), productUpdateDto.getImage2(), product.getImage2Url(), product::setImage2Url);
+        updateProductImage(productUpdateDto.getIsImage3Deleted(), productUpdateDto.getImage3(), product.getImage3Url(), product::setImage3Url);
+    }
+
+    // 상품 수정 dto 반환
+    @Transactional
+    public ProductUpdateDto getProductUpdateDto(Long productId) {
+        return mapToProductUpdateDto(productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다.")));
+    }
+
+    private void updateProductImage(Boolean isDeleted, MultipartFile newImageFile, String currentImageUrl, Consumer<String> imageSetter) throws IOException {
+
+        boolean safeIsDeleted = Boolean.TRUE.equals(isDeleted);
+
+        if (safeIsDeleted) {
+            fileService.deleteFile(currentImageUrl);
+            imageSetter.accept(null);
+        } else if (fileService.isImageFile(newImageFile)) {
+            fileService.deleteFile(currentImageUrl);
+            String storeFileName = fileService.storeFile(newImageFile);
+            imageSetter.accept(storeFileName);
+        }
+    }
+
+
     private AdminProductListDto mapToAdminProductListDto(Product product) {
         AdminProductListDto adminProductListDto = new AdminProductListDto();
         adminProductListDto.setId(product.getId());
@@ -61,10 +109,27 @@ public class ProductService {
         return adminProductListDto;
     }
 
+    private ProductUpdateDto mapToProductUpdateDto(Product product) {
+        ProductUpdateDto productUpdateDto = new ProductUpdateDto();
+
+        productUpdateDto.setId(product.getId());
+        productUpdateDto.setName(product.getName());
+        productUpdateDto.setPrice(product.getPrice());
+        productUpdateDto.setStock(product.getStock());
+        productUpdateDto.setStatus(product.getStatus());
+
+        productUpdateDto.setImageHeadUrl("/productImage/" + product.getImageHeadUrl());
+        if (product.getImage1Url() != null) productUpdateDto.setImage1Url("/productImage/" + product.getImage1Url());
+        if (product.getImage2Url() != null) productUpdateDto.setImage2Url("/productImage/" + product.getImage2Url());
+        if (product.getImage3Url() != null) productUpdateDto.setImage3Url("/productImage/" + product.getImage3Url());
+
+        return productUpdateDto;
+    }
+
     private void optionalImageProcess(MultipartFile multipartFile, Consumer<String> imageSetter) throws IOException {
 
-        if (fileStore.isImageFile(multipartFile)) {
-            String urlStore = fileStore.storeFile(multipartFile);
+        if (fileService.isImageFile(multipartFile)) {
+            String urlStore = fileService.storeFile(multipartFile);
             imageSetter.accept(urlStore);
         }
     }

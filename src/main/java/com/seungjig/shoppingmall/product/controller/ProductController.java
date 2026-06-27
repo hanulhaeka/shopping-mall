@@ -1,7 +1,10 @@
 package com.seungjig.shoppingmall.product.controller;
 
+import com.seungjig.shoppingmall.global.util.FileService;
+import com.seungjig.shoppingmall.product.entity.ProductStatus;
 import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
+import com.seungjig.shoppingmall.product.entity.dto.ProductUpdateDto;
 import com.seungjig.shoppingmall.product.exception.NotCorrectFileTypeException;
 import com.seungjig.shoppingmall.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -25,6 +26,12 @@ import java.io.IOException;
 public class ProductController {
 
     private final ProductService productService;
+    private final FileService fileService;
+
+    @ModelAttribute("productStatuses")
+    public ProductStatus[] productStatuses() {
+        return ProductStatus.values();
+    }
 
     // 상품 등록 폼 전송
     @GetMapping("/create")
@@ -47,7 +54,7 @@ public class ProductController {
         try {
             productService.createProduct(productCreateDto);
         } catch (NotCorrectFileTypeException e) {
-            bindingResult.rejectValue("imageHead", "NotCorrectFileType", e.getMessage());
+            bindingResult.rejectValue("imageHead", "invalidType", e.getMessage());
             return "product/create";
         }
 
@@ -61,6 +68,47 @@ public class ProductController {
         model.addAttribute("page", page);
 
         return "product/admin-product-list";
+    }
+
+    // 상품 수정 폼 전송
+    @GetMapping("/update/{productId}")
+    public String updateProductForm(@PathVariable("productId") Long productId, Model model) {
+        model.addAttribute("productUpdateDto", productService.getProductUpdateDto(productId));
+        return "product/update";
+    }
+
+    // 상품 수정 요청 처리
+    @PostMapping("/update")
+    public String updateProduct(@Validated @ModelAttribute("productUpdateDto") ProductUpdateDto productUpdateDto, BindingResult bindingResult) throws IOException {
+
+        if (productUpdateDto.getImageHead() != null && !productUpdateDto.getImageHead().isEmpty()
+                && !fileService.isImageFile(productUpdateDto.getImageHead())) {
+            bindingResult.rejectValue("imageHead", "invalidType", "이미지 파일이 아닙니다.");
+        }
+
+        validateImageFile(bindingResult, productUpdateDto.getImage1(), productUpdateDto.getIsImage1Deleted(), "image1");
+        validateImageFile(bindingResult, productUpdateDto.getImage2(), productUpdateDto.getIsImage2Deleted(), "image2");
+        validateImageFile(bindingResult, productUpdateDto.getImage3(), productUpdateDto.getIsImage3Deleted(), "image3");
+
+        if (bindingResult.hasErrors()) {
+            return "product/update";
+        }
+
+        productService.updateProduct(productUpdateDto);
+
+        return "redirect:/products/admin/list";
+
+    }
+
+    private void validateImageFile(BindingResult bindingResult, MultipartFile file, Boolean isDeleted, String fieldName) {
+
+        boolean safeIsDeleted = Boolean.TRUE.equals(isDeleted);
+
+        if (!safeIsDeleted && file != null && !file.isEmpty()) {
+            if (!fileService.isImageFile(file)) {
+                bindingResult.rejectValue(fieldName, "invalidType", "이미지 파일이 아닙니다.");
+            }
+        }
     }
 
 }
