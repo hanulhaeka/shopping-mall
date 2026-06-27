@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상품 수정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+<h1 class="title text-center mb-3 mt-5">Shopping Mall</h1>
+<div class="d-flex justify-content-between border-bottom border-3 pb-2 mb-3">
+    <div class="ms-3">
+        <a class="text-decoration-none text-reset me-1" href="/products/create">상품 등록</a>
+        <a class="text-decoration-none text-reset" href="/products/admin/list">상품 목록</a>
+    </div>
+    <a class="text-decoration-none text-reset me-3" href="/logout">로그아웃</a>
+</div>
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <form class="w-50" th:action="@{/products/update}" th:object="${productUpdateDto}" method="post" enctype="multipart/form-data">
+        <h2 class="mb-3">상품 수정</h2>
+
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-3">
+            <label class="form-label text-start w-100 mb-1" for="name">상품명 (필수)</label>
+            <input class="form-control" th:classappend="${#fields.hasErrors('name')}? 'is-invalid'" type="text" id="name" th:field="*{name}">
+            <div class="text-start invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-start w-100 mb-1" for="price">가격 (필수)</label>
+            <input class="form-control" th:classappend="${#fields.hasErrors('price')}? 'is-invalid'" type="text" id="price" th:field="*{price}">
+            <div class="text-start invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-start w-100 mb-1" for="stock">재고 (필수)</label>
+            <input class="form-control" th:classappend="${#fields.hasErrors('stock')}? 'is-invalid'" type="text" id="stock" th:field="*{stock}">
+            <div class="text-start invalid-feedback" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-start w-100 mb-1" for="status">상품 상태</label>
+            <select th:field="*{status}" id="status" class="form-select">
+                <option value="">== 상태 선택 ==</option>
+                <option th:each="type : ${productStatuses}"
+                        th:value="${type.name()}"
+                        th:text="${type.description}">판매중</option>
+            </select>
+            <div class="text-start invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+        </div>
+
+        <div class="d-flex flex-column mb-3">
+            <label class="form-label text-start w-100 mb-1">상품 대표 이미지</label>
+            <img class="img-fluid mb-1" id="imgHead" th:src="*{imageHeadUrl}" th:data-origin-src="*{imageHeadUrl}">
+            <input class="form-control mb-1 d-none" th:classappend="${#fields.hasErrors('imageHead')}? 'is-invalid'" type="file" id="imageHead" name="imageHead" onchange="changeImg(this, 'imgHead')">
+            <button class="btn btn-success btn-sm align-self-end" id="updateBtnHead" onclick="openUpload('Head')" type="button">수정</button>
+            <button class="btn btn-danger btn-sm align-self-end d-none" id="cancelBtnHead" onclick="cancelChanges('Head')" type="button">취소</button>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('imageHead')}" th:errors="*{imageHead}"></div>
+        </div>
+
+        <div class="d-flex flex-column mb-3">
+            <label class="form-label text-start w-100 mb-1">상품 설명 이미지 1</label>
+            <img class="img-fluid mb-1" id="img1" th:src="*{image1Url}" th:data-origin-src="*{image1Url}" th:classappend="*{image1Url == null or image1Url == ''} ? 'd-none'">
+
+            <input class="form-control d-none mb-1" type="file" id="image1" name="image1" onchange="changeImg(this, 'img1')">
+            <input type="hidden" id="isImage1Deleted" name="isImage1Deleted" value="false">
+
+            <div class="d-flex gap-1 align-self-end">
+                <button class="btn btn-success btn-sm" id="updateBtn1" onclick="openUpload('1')" type="button">수정</button>
+                <button class="btn btn-danger btn-sm" id="deleteBtn1" onclick="deleteImage('1')" type="button">삭제</button>
+                <button class="btn btn-danger btn-sm d-none" id="cancelBtn1" onclick="cancelChanges('1')" type="button">취소</button>
+            </div>
+
+        </div>
+
+        <div class="d-flex flex-column mb-3">
+            <label class="form-label text-start w-100 mb-1">상품 설명 이미지 2</label>
+            <img class="img-fluid mb-1" id="img2" th:src="*{image2Url}" th:data-origin-src="*{image2Url}" th:classappend="*{image2Url == null or image2Url == ''} ? 'd-none'">
+
+            <input class="form-control d-none mb-1" type="file" id="image2" name="image2" onchange="changeImg(this, 'img2')">
+            <input type="hidden" id="isImage2Deleted" name="isImage2Deleted" value="false">
+
+            <div class="d-flex gap-1 align-self-end">
+                <button class="btn btn-success btn-sm" id="updateBtn2" onclick="openUpload('2')" type="button">수정</button>
+                <button class="btn btn-danger btn-sm" id="deleteBtn2" onclick="deleteImage('2')" type="button">삭제</button>
+                <button class="btn btn-danger btn-sm d-none" id="cancelBtn2" onclick="cancelChanges('2')" type="button">취소</button>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column mb-3">
+            <label class="form-label text-start w-100 mb-1">상품 설명 이미지 3</label>
+            <img class="img-fluid mb-1" id="img3" th:src="*{image3Url}" th:data-origin-src="*{image3Url}" th:classappend="*{image3Url == null or image3Url == ''} ? 'd-none'">
+
+            <input class="form-control d-none mb-1" type="file" id="image3" name="image3" onchange="changeImg(this, 'img3')">
+            <input type="hidden" id="isImage3Deleted" name="isImage3Deleted" value="false">
+
+            <div class="d-flex gap-1 align-self-end">
+                <button class="btn btn-success btn-sm" id="updateBtn3" onclick="openUpload('3')" type="button">수정</button>
+                <button class="btn btn-danger btn-sm" id="deleteBtn3" onclick="deleteImage('3')" type="button">삭제</button>
+                <button class="btn btn-danger btn-sm d-none" id="cancelBtn3" onclick="cancelChanges('3')" type="button">취소</button>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-success w-25" type="submit">수정 완료</button>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+    // 수정 버튼
+    function openUpload(key) {
+        document.getElementById('image' + key).classList.remove('d-none');
+        document.getElementById('cancelBtn' + key).classList.remove('d-none');
+        document.getElementById('updateBtn' + key).classList.add('d-none');
+
+        const deleteBtn = document.getElementById('deleteBtn' + key);
+        if (deleteBtn) deleteBtn.classList.add('d-none');
+    }
+
+    // 삭제 버튼
+    function deleteImage(key) {
+        document.getElementById('img' + key).src = "";
+        document.getElementById('image' + key).value = "";
+        document.getElementById('isImage' + key + 'Deleted').value = "true";
+
+        document.getElementById('cancelBtn' + key).classList.remove('d-none');
+        document.getElementById('updateBtn' + key).classList.add('d-none');
+        document.getElementById('deleteBtn' + key).classList.add('d-none');
+    }
+
+    // 취소 버튼
+    function cancelChanges(key) {
+        const preview = document.getElementById('img' + key);
+        const originSrc = preview.getAttribute('data-origin-src');
+
+        preview.src = originSrc;
+        document.getElementById('image' + key).value = "";
+
+        const deleteHidden = document.getElementById('isImage' + key + 'Deleted');
+        if (deleteHidden) deleteHidden.value = "false";
+
+        document.getElementById('image' + key).classList.add('d-none');
+        document.getElementById('cancelBtn' + key).classList.add('d-none');
+        document.getElementById('updateBtn' + key).classList.remove('d-none');
+
+        const deleteBtn = document.getElementById('deleteBtn' + key);
+        if (deleteBtn) deleteBtn.classList.remove('d-none');
+    }
+
+    // 파일 선택
+    function changeImg(input, imgPreviewId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById(imgPreviewId);
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+</body>
+</html>
