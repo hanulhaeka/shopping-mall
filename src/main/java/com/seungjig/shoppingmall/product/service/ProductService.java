@@ -5,6 +5,7 @@ import com.seungjig.shoppingmall.product.entity.Product;
 import com.seungjig.shoppingmall.product.entity.ProductStatus;
 import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
+import com.seungjig.shoppingmall.product.entity.dto.ProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductUpdateDto;
 import com.seungjig.shoppingmall.product.exception.NotCorrectFileTypeException;
 import com.seungjig.shoppingmall.product.repository.ProductRepository;
@@ -97,6 +98,12 @@ public class ProductService {
         }
     }
 
+    // 상품 목록 (일반 유저용) 조회
+    @Transactional
+    public Page<ProductListDto> getProductList(Pageable pageable) {
+        return productRepository.findAll(pageable).map(this::mapToProductListDto);
+    }
+
 
     private AdminProductListDto mapToAdminProductListDto(Product product) {
         AdminProductListDto adminProductListDto = new AdminProductListDto();
@@ -118,10 +125,10 @@ public class ProductService {
         productUpdateDto.setStock(product.getStock());
         productUpdateDto.setStatus(product.getStatus());
 
-        productUpdateDto.setImageHeadUrl("/productImage/" + product.getImageHeadUrl());
-        if (product.getImage1Url() != null) productUpdateDto.setImage1Url("/productImage/" + product.getImage1Url());
-        if (product.getImage2Url() != null) productUpdateDto.setImage2Url("/productImage/" + product.getImage2Url());
-        if (product.getImage3Url() != null) productUpdateDto.setImage3Url("/productImage/" + product.getImage3Url());
+        productUpdateDto.setImageHeadUrl(FileService.PRODUCT_IMAGE_PREFIX + product.getImageHeadUrl());
+        if (product.getImage1Url() != null) productUpdateDto.setImage1Url(FileService.PRODUCT_IMAGE_PREFIX + product.getImage1Url());
+        if (product.getImage2Url() != null) productUpdateDto.setImage2Url(FileService.PRODUCT_IMAGE_PREFIX + product.getImage2Url());
+        if (product.getImage3Url() != null) productUpdateDto.setImage3Url(FileService.PRODUCT_IMAGE_PREFIX + product.getImage3Url());
 
         return productUpdateDto;
     }
@@ -132,5 +139,14 @@ public class ProductService {
             String urlStore = fileService.storeFile(multipartFile);
             imageSetter.accept(urlStore);
         }
+    }
+
+    private ProductListDto mapToProductListDto(Product product) {
+        ProductListDto productListDto = new ProductListDto();
+        productListDto.setId(product.getId());
+        productListDto.setName(product.getName());
+        productListDto.setPrice(product.getPrice());
+        productListDto.setImageUrl(FileService.PRODUCT_IMAGE_PREFIX + product.getImageHeadUrl());
+        return productListDto;
     }
 }
