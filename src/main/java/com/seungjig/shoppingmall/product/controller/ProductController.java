@@ -4,6 +4,7 @@ import com.seungjig.shoppingmall.global.util.FileService;
 import com.seungjig.shoppingmall.product.entity.ProductStatus;
 import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
+import com.seungjig.shoppingmall.product.entity.dto.ProductListDto;
 import com.seungjig.shoppingmall.product.entity.dto.ProductUpdateDto;
 import com.seungjig.shoppingmall.product.exception.NotCorrectFileTypeException;
 import com.seungjig.shoppingmall.product.service.ProductService;
@@ -98,6 +99,15 @@ public class ProductController {
 
         return "redirect:/products/admin/list";
 
+    }
+
+    // 상품 목록 (일반 유저용) 조회
+    @GetMapping("/list")
+    public String getProductList(@PageableDefault(page = 0, size = 6) Pageable pageable, Model model) {
+        Page<ProductListDto> page = productService.getProductList(pageable);
+        model.addAttribute("page", page);
+
+        return "product/product-list";
     }
 
     private void validateImageFile(BindingResult bindingResult, MultipartFile file, Boolean isDeleted, String fieldName) {
