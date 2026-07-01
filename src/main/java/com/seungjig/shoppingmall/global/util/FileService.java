@@ -15,6 +15,8 @@ import java.util.UUID;
 @Component
 public class FileService {
 
+    public static final String PRODUCT_IMAGE_PREFIX = "/productImage/";
+
     @Value("${file.dir}")
     private String fileDir;
 
