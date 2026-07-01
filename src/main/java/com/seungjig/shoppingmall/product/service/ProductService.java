@@ -3,10 +3,7 @@ package com.seungjig.shoppingmall.product.service;
 import com.seungjig.shoppingmall.global.util.FileService;
 import com.seungjig.shoppingmall.product.entity.Product;
 import com.seungjig.shoppingmall.product.entity.ProductStatus;
-import com.seungjig.shoppingmall.product.entity.dto.AdminProductListDto;
-import com.seungjig.shoppingmall.product.entity.dto.ProductCreateDto;
-import com.seungjig.shoppingmall.product.entity.dto.ProductListDto;
-import com.seungjig.shoppingmall.product.entity.dto.ProductUpdateDto;
+import com.seungjig.shoppingmall.product.entity.dto.*;
 import com.seungjig.shoppingmall.product.exception.NotCorrectFileTypeException;
 import com.seungjig.shoppingmall.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -99,11 +96,25 @@ public class ProductService {
     }
 
     // 상품 목록 (일반 유저용) 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<ProductListDto> getProductList(Pageable pageable) {
         return productRepository.findAll(pageable).map(this::mapToProductListDto);
     }
 
+    @Transactional(readOnly = true)
+    public ProductDetailDto getProductDetailDto(Long productId) {
+        ProductDetailDto productDetailDto = new ProductDetailDto();
+        Product product = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        productDetailDto.setId(product.getId());
+        productDetailDto.setName(product.getName());
+        productDetailDto.setPrice(product.getPrice());
+        productDetailDto.setImageHeadUrl(FileService.PRODUCT_IMAGE_PREFIX + product.getImageHeadUrl());
+        if (product.getImage1Url() != null) productDetailDto.setImage1Url(FileService.PRODUCT_IMAGE_PREFIX + product.getImage1Url());
+        if (product.getImage2Url() != null) productDetailDto.setImage2Url(FileService.PRODUCT_IMAGE_PREFIX + product.getImage2Url());
+        if (product.getImage3Url() != null) productDetailDto.setImage3Url(FileService.PRODUCT_IMAGE_PREFIX + product.getImage3Url());
+
+        return productDetailDto;
+    }
 
     private AdminProductListDto mapToAdminProductListDto(Product product) {
         AdminProductListDto adminProductListDto = new AdminProductListDto();
@@ -149,4 +160,5 @@ public class ProductService {
         productListDto.setImageUrl(FileService.PRODUCT_IMAGE_PREFIX + product.getImageHeadUrl());
         return productListDto;
     }
+
 }
