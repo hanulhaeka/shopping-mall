@@ -110,6 +110,13 @@ public class ProductController {
         return "product/product-list";
     }
 
+    // 상품 단건 상세 조회
+    @GetMapping("/{productId}")
+    public String getProductDetail(@PathVariable("productId") Long productId, Model model) {
+        model.addAttribute("productDetailDto", productService.getProductDetailDto(productId));
+        return "product/product-detail";
+    }
+
     private void validateImageFile(BindingResult bindingResult, MultipartFile file, Boolean isDeleted, String fieldName) {
 
         boolean safeIsDeleted = Boolean.TRUE.equals(isDeleted);
