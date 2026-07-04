@@ -26,7 +26,7 @@
 <div class="container my-5">
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <div class="col" th:each="product : ${page.content}">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm click-card" th:data-product-id="${product.id}" style="cursor: pointer;">
                 <img th:src="${product.imageUrl}" class="card-img-top object-fit-cover" alt="상품 이미지" style="height: 200px;">
 
                 <div class="card-body">
@@ -82,6 +82,15 @@
         </ul>
     </nav>
 </div>
+
+<script>
+    document.querySelectorAll('.click-card').forEach(card => {
+    card.addEventListener('click', (event) => {
+        const productId = event.currentTarget.dataset.productId;
+        window.location.href = `/products/${productId}`;
+        });
+    });
+</script>
 
 </body>
 </html>
