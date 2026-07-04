@@ -30,7 +30,7 @@
         <tr class="align-middle" th:each="productDto, productStat : ${page.content}">
             <td  th:text="${productStat.count}"></td>
             <td>
-                <a class="text-decoration-none text-reset" th:href="@{/products/content/{id}(id=${productDto.id})}" th:text="${productDto.name}">name</a>
+                <a class="text-decoration-none text-reset" th:href="@{/products/{id}(id=${productDto.id})}" th:text="${productDto.name}">name</a>
             </td>
             <td th:text="${productDto.price}">price</td>
             <td th:text="${productDto.stock}">stock</td>
