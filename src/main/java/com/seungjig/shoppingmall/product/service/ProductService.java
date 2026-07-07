@@ -98,9 +98,10 @@ public class ProductService {
     // 상품 목록 (일반 유저용) 조회
     @Transactional(readOnly = true)
     public Page<ProductListDto> getProductList(Pageable pageable) {
-        return productRepository.findAll(pageable).map(this::mapToProductListDto);
+        return productRepository.findByStockGreaterThanAndStatus(1,ProductStatus.ACTIVE, pageable).map(this::mapToProductListDto);
     }
 
+    //상픔 상세 조회
     @Transactional(readOnly = true)
     public ProductDetailDto getProductDetailDto(Long productId) {
         ProductDetailDto productDetailDto = new ProductDetailDto();
@@ -115,6 +116,7 @@ public class ProductService {
 
         return productDetailDto;
     }
+    
 
     private AdminProductListDto mapToAdminProductListDto(Product product) {
         AdminProductListDto adminProductListDto = new AdminProductListDto();
