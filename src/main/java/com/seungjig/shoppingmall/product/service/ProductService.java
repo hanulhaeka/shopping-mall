@@ -46,7 +46,7 @@ public class ProductService {
     // 관리자 상품 목록 리스트
     @Transactional(readOnly = true)
     public Page<AdminProductListDto> getAdminProductList(Pageable pageable) {
-        return productRepository.findAll(pageable).map(this::mapToAdminProductListDto);
+        return productRepository.findByStatusNot(ProductStatus.DELETE, pageable).map(this::mapToAdminProductListDto);
     }
 
 
@@ -81,19 +81,6 @@ public class ProductService {
         return mapToProductUpdateDto(productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다.")));
     }
 
-    private void updateProductImage(Boolean isDeleted, MultipartFile newImageFile, String currentImageUrl, Consumer<String> imageSetter) throws IOException {
-
-        boolean safeIsDeleted = Boolean.TRUE.equals(isDeleted);
-
-        if (safeIsDeleted) {
-            fileService.deleteFile(currentImageUrl);
-            imageSetter.accept(null);
-        } else if (fileService.isImageFile(newImageFile)) {
-            fileService.deleteFile(currentImageUrl);
-            String storeFileName = fileService.storeFile(newImageFile);
-            imageSetter.accept(storeFileName);
-        }
-    }
 
     // 상품 목록 (일반 유저용) 조회
     @Transactional(readOnly = true)
@@ -116,7 +103,6 @@ public class ProductService {
 
         return productDetailDto;
     }
-    
 
     private AdminProductListDto mapToAdminProductListDto(Product product) {
         AdminProductListDto adminProductListDto = new AdminProductListDto();
@@ -161,6 +147,20 @@ public class ProductService {
         productListDto.setPrice(product.getPrice());
         productListDto.setImageUrl(FileService.PRODUCT_IMAGE_PREFIX + product.getImageHeadUrl());
         return productListDto;
+    }
+
+    private void updateProductImage(Boolean isDeleted, MultipartFile newImageFile, String currentImageUrl, Consumer<String> imageSetter) throws IOException {
+
+        boolean safeIsDeleted = Boolean.TRUE.equals(isDeleted);
+
+        if (safeIsDeleted) {
+            fileService.deleteFile(currentImageUrl);
+            imageSetter.accept(null);
+        } else if (fileService.isImageFile(newImageFile)) {
+            fileService.deleteFile(currentImageUrl);
+            String storeFileName = fileService.storeFile(newImageFile);
+            imageSetter.accept(storeFileName);
+        }
     }
 
 }
