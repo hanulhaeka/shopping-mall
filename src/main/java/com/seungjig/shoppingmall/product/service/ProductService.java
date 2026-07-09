@@ -104,6 +104,13 @@ public class ProductService {
         return productDetailDto;
     }
 
+    //상품 삭제 상태 변경
+    @Transactional
+    public void softDeleteProduct(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        product.setStatus(ProductStatus.DELETE);
+    }
+
     private AdminProductListDto mapToAdminProductListDto(Product product) {
         AdminProductListDto adminProductListDto = new AdminProductListDto();
         adminProductListDto.setId(product.getId());
