@@ -18,8 +18,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/products")
@@ -31,7 +33,9 @@ public class ProductController {
 
     @ModelAttribute("productStatuses")
     public ProductStatus[] productStatuses() {
-        return ProductStatus.values();
+        return Arrays.stream(ProductStatus.values())
+                .filter(status -> status != ProductStatus.DELETE)
+                .toArray(ProductStatus[]::new);
     }
 
     // 상품 등록 폼 전송
@@ -115,6 +119,16 @@ public class ProductController {
     public String getProductDetail(@PathVariable("productId") Long productId, Model model) {
         model.addAttribute("productDetailDto", productService.getProductDetailDto(productId));
         return "product/product-detail";
+    }
+
+    // 상품 삭제 상태 변경
+    @PostMapping("/delete/{productId}")
+    public String softDeleteProduct(@PathVariable Long productId, RedirectAttributes redirectAttributes) {
+        productService.softDeleteProduct(productId);
+
+        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
+
+        return "redirect:/products/admin/list";
     }
 
     private void validateImageFile(BindingResult bindingResult, MultipartFile file, Boolean isDeleted, String fieldName) {

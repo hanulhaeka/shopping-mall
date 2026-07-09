@@ -35,9 +35,11 @@
             <td th:text="${productDto.price}">price</td>
             <td th:text="${productDto.stock}">stock</td>
             <td th:text="${productDto.status.name() == 'ACTIVE' ? '판매중' : '판매 종료'}">status</td>
-            <td>
+            <td class="d-flex gap-1">
                 <a class="btn btn-success" th:href="@{/products/update/{id}(id=${productDto.id})}">수정</a>
-                <a class="btn btn-danger" th:href="@{/products/delete/{id}(id=${productDto.id})}">삭제</a>
+                <form th:action="@{/products/delete/{id}(id=${productDto.id})}" method="post">
+                    <button class="btn btn-danger" type="submit">삭제</button>
+                </form>
             </td>
         </tr>
     </table>
@@ -87,5 +89,13 @@
         </ul>
     </nav>
 </div>
+
+<script th:inline="javascript">
+    const message = [[${message}]];
+
+    if (message) {
+        alert(message);
+    }
+</script>
 </body>
 </html>
