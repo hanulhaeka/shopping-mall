@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/products")
@@ -31,7 +32,9 @@ public class ProductController {
 
     @ModelAttribute("productStatuses")
     public ProductStatus[] productStatuses() {
-        return ProductStatus.values();
+        return Arrays.stream(ProductStatus.values())
+                .filter(status -> status != ProductStatus.DELETE)
+                .toArray(ProductStatus[]::new);
     }
 
     // 상품 등록 폼 전송
