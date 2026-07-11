@@ -75,5 +75,23 @@ public class ProductServiceIntegrationTest {
         assertThat(updateProduct.getImageHeadUrl()).isEqualTo("savedImageFileName.png");
         verify(fileService).deleteFile(anyString());
     }
-    
+
+    @Test
+    @DisplayName("상품 삭제 성공")
+    void productDeleteSuccess() {
+        //given
+        Product product = new Product("name", 10000, 50, ProductStatus.ACTIVE);
+        product.setImageHeadUrl("imageHeadUrl.png");
+        Product saved = productRepository.save(product);
+
+        //when
+        productService.softDeleteProduct(saved.getId());
+        em.flush();
+        em.clear();
+
+        //then
+        Product softDeleteProduct = productRepository.findById(saved.getId()).get();
+        assertThat(softDeleteProduct.getStatus()).isEqualTo(ProductStatus.DELETE);
+    }
+
 }
