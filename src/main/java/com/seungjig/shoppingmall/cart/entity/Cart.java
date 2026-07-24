@@ -4,11 +4,13 @@ import com.seungjig.shoppingmall.global.entity.BaseEntity;
 import com.seungjig.shoppingmall.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Entity
 @Table(name="carts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
