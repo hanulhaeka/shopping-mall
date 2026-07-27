@@ -1,5 +1,6 @@
 package com.seungjig.shoppingmall.global.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +43,21 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .deleteCookies("JSESSIONID")
                         .permitAll()
+                )
+
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            String requestedWith = request.getHeader("X-Requested-With");
+
+                            if ("XMLHttpRequest".equals(requestedWith)) {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType("application/json;charset=UTF-8");
+                                response.getWriter().write("{\"message\": \"로그인이 필요한 서비스입니다.\"}");
+                            } else {
+                                response.sendRedirect("/users/signin");
+                            }
+                        })
+
                 );
 
         return http.build();
