@@ -3,8 +3,10 @@ package com.seungjig.shoppingmall.cart.entity.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class CartItemCreateDto {
 
     @NotNull(message = "상품 아이디가 필요합니다.")
