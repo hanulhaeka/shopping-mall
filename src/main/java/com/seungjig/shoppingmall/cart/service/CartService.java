@@ -53,10 +53,14 @@ public class CartService {
    }
 
    // 장바구니 목록 조회
-    @Transactional(readOnly = true)
+    @Transactional
     public List<CartListDto> getCartList(Long userId) {
-       Cart cart = cartRepository.findByUserId(userId)
-               .orElseThrow(() -> new IllegalArgumentException());
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    User user = userRepository.findById(userId)
+                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+                    return cartRepository.save(new Cart(user));
+                });
 
         return cartItemRepository.findByCartIdWithProduct(cart.getId())
                 .stream()
