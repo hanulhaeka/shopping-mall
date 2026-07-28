@@ -3,6 +3,7 @@ package com.seungjig.shoppingmall.cart.service;
 import com.seungjig.shoppingmall.cart.entity.Cart;
 import com.seungjig.shoppingmall.cart.entity.CartItem;
 import com.seungjig.shoppingmall.cart.entity.dto.CartItemCreateDto;
+import com.seungjig.shoppingmall.cart.entity.dto.CartListDto;
 import com.seungjig.shoppingmall.cart.repository.CartItemRepository;
 import com.seungjig.shoppingmall.cart.repository.CartRepository;
 import com.seungjig.shoppingmall.product.entity.Product;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -49,6 +51,25 @@ public class CartService {
        }
 
    }
+
+   // 장바구니 목록 조회
+    @Transactional(readOnly = true)
+    public List<CartListDto> getCartList(Long userId) {
+       Cart cart = cartRepository.findByUserId(userId)
+               .orElseThrow(() -> new IllegalArgumentException());
+
+        return cartItemRepository.findByCartIdWithProduct(cart.getId())
+                .stream()
+                .map(this::mapToCartListDto)
+                .toList();
+
+    }
+
+    private CartListDto mapToCartListDto(CartItem cartItem) {
+       return new CartListDto(cartItem.getId(), cartItem.getProduct().getId(),
+               cartItem.getProduct().getName(), cartItem.getProduct().getImageHeadUrl(),
+               cartItem.getUnitPrice(), cartItem.getQuantity(), cartItem.getQuantity() * cartItem.getUnitPrice());
+    }
 
 
 }
