@@ -1,7 +1,9 @@
 package com.seungjig.shoppingmall.cart.entity.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public class CartListDto {
 
