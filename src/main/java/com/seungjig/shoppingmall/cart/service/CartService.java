@@ -6,6 +6,7 @@ import com.seungjig.shoppingmall.cart.entity.dto.CartItemCreateDto;
 import com.seungjig.shoppingmall.cart.entity.dto.CartListDto;
 import com.seungjig.shoppingmall.cart.repository.CartItemRepository;
 import com.seungjig.shoppingmall.cart.repository.CartRepository;
+import com.seungjig.shoppingmall.global.util.FileService;
 import com.seungjig.shoppingmall.product.entity.Product;
 import com.seungjig.shoppingmall.product.repository.ProductRepository;
 import com.seungjig.shoppingmall.user.entity.User;
@@ -25,6 +26,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final FileService fileService;
 
 
    // 장바구니 상품 추가
@@ -71,7 +73,7 @@ public class CartService {
 
     private CartListDto mapToCartListDto(CartItem cartItem) {
        return new CartListDto(cartItem.getId(), cartItem.getProduct().getId(),
-               cartItem.getProduct().getName(), cartItem.getProduct().getImageHeadUrl(),
+               cartItem.getProduct().getName(), FileService.PRODUCT_IMAGE_PREFIX + cartItem.getProduct().getImageHeadUrl(),
                cartItem.getUnitPrice(), cartItem.getQuantity(), cartItem.getQuantity() * cartItem.getUnitPrice());
     }
 
