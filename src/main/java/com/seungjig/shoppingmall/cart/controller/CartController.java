@@ -1,6 +1,7 @@
 package com.seungjig.shoppingmall.cart.controller;
 
 import com.seungjig.shoppingmall.cart.entity.dto.CartItemCreateDto;
+import com.seungjig.shoppingmall.cart.entity.dto.CartItemUpdateDto;
 import com.seungjig.shoppingmall.cart.entity.dto.CartListDto;
 import com.seungjig.shoppingmall.cart.service.CartService;
 import com.seungjig.shoppingmall.global.exception.ErrorResponse;
@@ -13,9 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/carts")
@@ -47,5 +48,16 @@ public class CartController {
         model.addAttribute("cartList", cartList);
 
         return "cart/cart-list";
+    }
+
+    // 장바구니 상품 수량 변경
+    @PostMapping("/update")
+    @ResponseBody
+    public ResponseEntity<?> updateCartItemQuantity(@RequestBody CartItemUpdateDto cartItemUpdateDto,@AuthenticationPrincipal CustomUserDetails userDetails) {
+        cartService.changeCartItemQuantity(cartItemUpdateDto.getCartItemId(), userDetails.getUserId(), cartItemUpdateDto.getQuantity());
+        return ResponseEntity.ok(Map.of(
+                "message", "수량이 성공적으로 변경되었습니다.",
+                "quantity", cartItemUpdateDto.getQuantity()
+        ));
     }
 }
