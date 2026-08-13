@@ -26,7 +26,6 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final FileService fileService;
 
 
    // 장바구니 상품 추가
@@ -46,7 +45,7 @@ public class CartService {
        Optional<CartItem> optionalCartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
        if (optionalCartItem.isPresent()) {
-           optionalCartItem.get().addQuantity(cartItemCreateDto.getItemQuantity());
+           optionalCartItem.get().changeQuantity(cartItemCreateDto.getItemQuantity());
        } else {
            cartItemRepository.save(
                    new CartItem(cart, product, cartItemCreateDto.getItemQuantity(), product.getPrice()));
@@ -69,6 +68,19 @@ public class CartService {
                 .map(this::mapToCartListDto)
                 .toList();
 
+    }
+
+    // 장바구니 상품 수량 변경
+    @Transactional
+    public void changeCartItemQuantity(Long cartItemId, Long userId, int cartItemQuantity) {
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(cartItemId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장바구니 상품이거나 접근 권한이 없는 상품입니다."));
+
+        if (cartItemQuantity < 1) {
+            throw new IllegalArgumentException("장바구니 상품 수량은 최소 1개 이상이여야 합니다.");
+        }
+
+        cartItem.setQuantity(cartItemQuantity);
     }
 
     private CartListDto mapToCartListDto(CartItem cartItem) {
