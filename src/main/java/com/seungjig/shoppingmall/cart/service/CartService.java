@@ -83,6 +83,13 @@ public class CartService {
         cartItem.setQuantity(cartItemQuantity);
     }
 
+    // 장바구니 상품 수량 조회
+    @Transactional(readOnly = true)
+    public Integer getCartItemQuantity(Long cartItemId) {
+       return cartItemRepository.findById(cartItemId)
+               .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장바구니 상품 입니다.")).getQuantity();
+    }
+
     private CartListDto mapToCartListDto(CartItem cartItem) {
        return new CartListDto(cartItem.getId(), cartItem.getProduct().getId(),
                cartItem.getProduct().getName(), FileService.PRODUCT_IMAGE_PREFIX + cartItem.getProduct().getImageHeadUrl(),
