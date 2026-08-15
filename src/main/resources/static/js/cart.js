@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function rollbackToLatestServerState(row, cartId) {
     try {
-      const response = await fetch(`/carts/items/${cartId}`);
+      const response = await fetch(`/carts/items/${cartId}/quantity`);
       if (response.ok) {
         const latestItem = await response.json();
         row.querySelector(".item-quantity-input").value = latestItem.quantity;

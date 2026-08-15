@@ -60,4 +60,14 @@ public class CartController {
                 "quantity", cartItemUpdateDto.getQuantity()
         ));
     }
+
+    // 장바구니 상품 수량 조회
+    @GetMapping("/items/{cartItemId}/quantity")
+    @ResponseBody
+    public ResponseEntity<?> getCartItemQuantity(@PathVariable Long cartItemId) {
+        Integer cartItemQuantity = cartService.getCartItemQuantity(cartItemId);
+        return ResponseEntity.ok(Map.of(
+                "quantity", cartItemQuantity
+        ));
+    }
 }
