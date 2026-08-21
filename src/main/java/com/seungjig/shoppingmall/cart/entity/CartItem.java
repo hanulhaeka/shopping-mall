@@ -6,8 +6,10 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "cart_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,7 +41,7 @@ public class CartItem extends BaseEntity {
     private Integer unitPrice;
 
 
-    public void addQuantity(Integer itemQuantity) {
+    public void changeQuantity(Integer itemQuantity) {
         this.quantity += itemQuantity;
     }
 }
