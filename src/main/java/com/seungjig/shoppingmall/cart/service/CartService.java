@@ -90,6 +90,14 @@ public class CartService {
                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장바구니 상품 입니다.")).getQuantity();
     }
 
+    // 장바구니 상품 삭제
+    @Transactional
+    public void deleteCartItem(Long cartItemId, Long userId) {
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(cartItemId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장바구니 상품이거나 접근 권한이 없는 상품입니다."));
+        cartItemRepository.delete(cartItem);
+    }
+
     private CartListDto mapToCartListDto(CartItem cartItem) {
        return new CartListDto(cartItem.getId(), cartItem.getProduct().getId(),
                cartItem.getProduct().getName(), FileService.PRODUCT_IMAGE_PREFIX + cartItem.getProduct().getImageHeadUrl(),
