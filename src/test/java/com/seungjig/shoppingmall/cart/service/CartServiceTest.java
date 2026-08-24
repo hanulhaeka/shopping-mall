@@ -70,4 +70,29 @@ public class CartServiceTest {
         assertThat(cartItem.getQuantity()).isEqualTo(6);
         verify(cartItemRepository, never()).save(any(CartItem.class));
     }
+
+    @Test
+    @DisplayName("장바구니 상품 삭제 성공")
+    void deleteCartItem_success() {
+        //given
+        User user = new User("loginId", "password", "name", "010-1234-5678", Role.USER, UserStatus.ACTIVE);
+        user.setId(1L);
+
+        Cart cart = new Cart(user);
+        cart.setId(1L);
+
+        Product product = new Product("productName", 10000, 100, ProductStatus.ACTIVE);
+        product.setId(1L);
+
+        CartItem cartItem = new CartItem(cart, product, 1, 10000);
+        cartItem.setId(1L);
+
+        given(cartItemRepository.findByIdAndUserId(cartItem.getId(), user.getId())).willReturn(Optional.of(cartItem));
+
+        //when
+        cartService.deleteCartItem(cartItem.getId(), user.getId());
+
+        //then
+        verify(cartItemRepository).delete(cartItem);
+    }
 }
