@@ -52,7 +52,7 @@
             </div>
 
             <div class="col d-flex justify-content-center align-items-center">
-                <form th:action="@{/carts/delete}" method="post" class="mb-0">
+                <form th:action="@{/carts/{cartItemId}/delete(cartItemId=${cartItem.cartItemId})}" method="post" class="mb-0">
                     <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
                 </form>
             </div>
