@@ -147,4 +147,31 @@ document.addEventListener("DOMContentLoaded", () => {
       totalDisplay.textContent = `총 주문 금액 : ${total.toLocaleString("ko-KR")}원`;
     }
   }
+
+  document.querySelectorAll(".cart-item-row form").forEach((form) => {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const row = form.closest(".cart-item-row");
+      if (!row) return;
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: getCsrfHeaders(),
+        });
+
+        if (!response.ok) {
+          throw new Error("장바구니 상품 삭제에 실패했습니다.");
+        }
+
+        row.remove();
+
+        updateTotalOrderPrice();
+      } catch (error) {
+        console.error("장바구니 상품 삭제 오류:", error);
+        alert(error.message || "상품 삭제 중 문제가 발생했습니다.");
+      }
+    });
+  });
 });

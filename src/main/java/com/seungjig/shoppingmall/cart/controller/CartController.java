@@ -53,7 +53,7 @@ public class CartController {
     // 장바구니 상품 수량 변경
     @PostMapping("/update")
     @ResponseBody
-    public ResponseEntity<?> updateCartItemQuantity(@RequestBody CartItemUpdateDto cartItemUpdateDto,@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> updateCartItemQuantity(@RequestBody CartItemUpdateDto cartItemUpdateDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
         cartService.changeCartItemQuantity(cartItemUpdateDto.getCartItemId(), userDetails.getUserId(), cartItemUpdateDto.getQuantity());
         return ResponseEntity.ok(Map.of(
                 "message", "수량이 성공적으로 변경되었습니다.",
@@ -69,5 +69,13 @@ public class CartController {
         return ResponseEntity.ok(Map.of(
                 "quantity", cartItemQuantity
         ));
+    }
+
+    // 장바구니 상품 삭제
+    @PostMapping("/{cartItemId}/delete")
+    @ResponseBody
+    public ResponseEntity<Void> deleteCartItem(@PathVariable Long cartItemId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        cartService.deleteCartItem(cartItemId, userDetails.getUserId());
+        return ResponseEntity.ok().build();
     }
 }
