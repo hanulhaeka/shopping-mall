@@ -34,4 +34,6 @@ public class OrderItem extends BaseEntity {
     @Column(nullable = false)
     private Integer unitPrice;
 
+    @Column(nullable = false)
+    private String productName;
 }
