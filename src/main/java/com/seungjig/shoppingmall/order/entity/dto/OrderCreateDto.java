@@ -32,4 +32,6 @@ public class OrderCreateDto {
     @Valid
     @NotEmpty(message = "주문 상품 목록은 최소 1개 이상이어야 합니다.")
     private List<OrderItemCreateDto> orderList = new ArrayList<>();
+
+    Boolean isCartOrder;
 }
