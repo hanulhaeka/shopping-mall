@@ -4,11 +4,15 @@ import com.seungjig.shoppingmall.global.entity.BaseEntity;
 import com.seungjig.shoppingmall.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="orders")
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Order extends BaseEntity {
 
     @Id
@@ -22,6 +26,7 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private Integer totalPrice;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private OrderStatus orderStatus = OrderStatus.ORDERED;
