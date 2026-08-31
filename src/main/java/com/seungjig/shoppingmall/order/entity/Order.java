@@ -3,13 +3,11 @@ package com.seungjig.shoppingmall.order.entity;
 import com.seungjig.shoppingmall.global.entity.BaseEntity;
 import com.seungjig.shoppingmall.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name="orders")
+@Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
