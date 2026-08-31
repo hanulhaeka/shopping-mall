@@ -4,6 +4,8 @@ import com.seungjig.shoppingmall.global.entity.BaseEntity;
 import com.seungjig.shoppingmall.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -13,7 +15,9 @@ import lombok.NoArgsConstructor;
                 @UniqueConstraint(name = "uk_order_product_unique", columnNames = {"order_id", "product_id"})
         }
 )
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class OrderItem extends BaseEntity {
 
     @Id
