@@ -31,7 +31,9 @@
     <div class="d-flex flex-column justify-content-center" style="min-width: 350px;">
         <h3 class="text-end" th:text="*{name}">상품명</h3>
         <p class="fw-bold text-end mb-5" th:text="${#numbers.formatInteger(productDetailDto.price, 3, 'COMMA')} + '원'">0원</p>
-        <div class="d-flex flex-column w-100">
+        <form th:action="@{/orders/create/direct}" class="d-flex flex-column w-100" method="GET">
+
+            <input type="hidden" name="productId" th:value="${productDetailDto.id}">
 
             <div class="mb-3 d-flex align-items-center justify-content-end quantity-wrapper">
                 <button type="button" class="me-2 btn btn-link text-decoration-none p-0 text-dark fw-bold fs-5">-</button>
@@ -43,11 +45,11 @@
                 <button type="submit" th:onclick="|addCart('*{id}')|" class="btn btn-light border w-50 fw-semibold rounded-pill text-nowrap flex-shrink-0">
                     장바구니 담기
                 </button>
-                <button type="submit" th:formaction="@{/order}" class="btn btn-dark w-50 fw-semibold rounded-pill text-nowrap flex-shrink-0">
+                <button type="submit" class="btn btn-dark w-50 fw-semibold rounded-pill text-nowrap flex-shrink-0">
                     주문하기
                 </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -56,7 +58,13 @@
 <img class="img-fluid d-block mx-auto" th:src="${productDetailDto.image3Url}">
 
 
-<script>
+<script th:inline="javascript">
+
+    const errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         // 1. 수량 조절 영역의 부모 요소를 찾습니다.
         const quantityContainer = document.querySelector(".quantity-wrapper");
