@@ -16,4 +16,5 @@ public class OrderItemCreateDto {
     @NotNull(message = "상품 가격 정보는 필수입니다.")
     @Min(value = 0, message = "상품 가격은 0원 이상이어야 합니다.")
     private Integer unitPrice;
+    private String imageHeadUrl;
 }
