@@ -109,7 +109,7 @@ public class OrderService {
         OrderCreateDto orderCreateDto = new OrderCreateDto();
         orderCreateDto.setOrderList(orderItemCreateDtoList);
         orderCreateDto.setOrdererName(user.getName());
-        orderCreateDto.setOrdererPhoneNumber(orderCreateDto.getOrdererPhoneNumber());
+        orderCreateDto.setOrdererPhoneNumber(user.getPhoneNumber());
 
         return orderCreateDto;
     }
