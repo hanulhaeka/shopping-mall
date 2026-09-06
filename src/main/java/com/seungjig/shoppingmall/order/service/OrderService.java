@@ -142,7 +142,8 @@ public class OrderService {
             orderItemCreateDto.setProductId(productId);
             orderItemCreateDto.setQuantity(quantities.get(i));
             orderItemCreateDto.setUnitPrice(product.getPrice());
-            orderItemCreateDto.setImageHeadUrl(fileService.getFullPath(product.getImageHeadUrl()));
+            orderItemCreateDto.setImageHeadUrl(FileService.PRODUCT_IMAGE_PREFIX + product.getImageHeadUrl());
+            orderItemCreateDto.setProductName(product.getName());
             list.add(orderItemCreateDto);
         }
 
