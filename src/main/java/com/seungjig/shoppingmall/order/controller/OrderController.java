@@ -55,19 +55,20 @@ public class OrderController {
                               @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         if (bindingResult.hasErrors()) {
-            return "orders/create";
+            return "order/create";
         }
 
         try {
+            orderCreateDto.setIsCartOrder(false);
             orderService.createOrder(orderCreateDto, userDetails.getUser(), orderCreateDto.getIsCartOrder());
         } catch (IncorrectPriceException e) {
             bindingResult.reject("incorrectPrice", "금액에 문제가 있습니다.");
-            return "orders/create";
+            return "order/create";
         } catch (OutOfStockException e) {
             bindingResult.reject("outOfStock", "재고가 부족합니다.");
-            return "orders/create";
+            return "order/create";
         }
 
-        return "redirect:/orders/list";
+        return "redirect:/";
     }
 }
