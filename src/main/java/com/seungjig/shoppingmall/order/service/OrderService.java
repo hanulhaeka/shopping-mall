@@ -32,7 +32,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final FileService fileService;
+
 
     // 주문 생성
     @Transactional
@@ -110,6 +110,8 @@ public class OrderService {
         orderCreateDto.setOrderList(orderItemCreateDtoList);
         orderCreateDto.setOrdererName(user.getName());
         orderCreateDto.setOrdererPhoneNumber(user.getPhoneNumber());
+        int sum = orderItemCreateDtoList.stream().mapToInt(o -> o.getQuantity() * o.getUnitPrice()).sum();
+        orderCreateDto.setTotalPrice(sum);
 
         return orderCreateDto;
     }
