@@ -13,12 +13,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/orders")
@@ -52,9 +55,25 @@ public class OrderController {
     // 주문 요청 처리
     @PostMapping("/create")
     public String createOrder(@Validated @ModelAttribute("orderCreateDto")OrderCreateDto orderCreateDto, BindingResult bindingResult,
-                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+                              @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 
         if (bindingResult.hasErrors()) {
+            if (bindingResult.hasFieldErrors("totalPrice") ||
+                    bindingResult.hasFieldErrors("ordererName") ||
+                    bindingResult.hasFieldErrors("ordererPhoneNumber") ||
+                    bindingResult.hasFieldErrors("orderList") ||
+                    hasOrderItemBindingErrors(bindingResult)) {
+                bindingResult.reject("order.invalid", "주문 정보를 다시 확인해주세요.");
+            }
+
+            model.addAttribute(
+                    "globalErrors",
+                    bindingResult.getGlobalErrors()
+                            .stream()
+                            .map(ObjectError::getDefaultMessage)
+                            .toList()
+            );
+
             return "order/create";
         }
 
@@ -70,5 +89,20 @@ public class OrderController {
         }
 
         return "redirect:/";
+    }
+
+    private boolean hasOrderItemBindingErrors(BindingResult bindingResult) {
+        Set<String> targetFields = Set.of(
+                "quantity",
+                "productId",
+                "price",
+                "unitPrice"
+        );
+
+        return bindingResult.getFieldErrors()
+                .stream()
+                .map(FieldError::getField)
+                .map(field -> field.replaceAll("orderList\\[\\d+\\]\\.", ""))
+                .anyMatch(targetFields::contains);
     }
 }
