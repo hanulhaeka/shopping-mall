@@ -1,6 +1,7 @@
 package com.seungjig.shoppingmall.order.service;
 
 import com.seungjig.shoppingmall.cart.entity.Cart;
+import com.seungjig.shoppingmall.cart.entity.CartItem;
 import com.seungjig.shoppingmall.cart.repository.CartItemRepository;
 import com.seungjig.shoppingmall.cart.repository.CartRepository;
 import com.seungjig.shoppingmall.global.util.FileService;
@@ -9,6 +10,7 @@ import com.seungjig.shoppingmall.order.entity.OrderItem;
 import com.seungjig.shoppingmall.order.entity.dto.OrderCreateDto;
 import com.seungjig.shoppingmall.order.entity.dto.OrderItemCreateDto;
 import com.seungjig.shoppingmall.order.exception.IncorrectPriceException;
+import com.seungjig.shoppingmall.order.exception.NotFoundOrderItemException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
 import com.seungjig.shoppingmall.order.repository.OrderItemRepository;
 import com.seungjig.shoppingmall.order.repository.OrderRepository;
@@ -98,6 +100,7 @@ public class OrderService {
         return order.getId();
     }
 
+    // 상품 상세에서 주문 페이지 반환 시 orderCreateDto 준비
     @Transactional(readOnly = true)
     public OrderCreateDto prepareDirectOrder(Long productId, Integer quantity, User user) {
         int stock = getStock(productId);
@@ -112,6 +115,35 @@ public class OrderService {
         orderCreateDto.setOrdererPhoneNumber(user.getPhoneNumber());
         int sum = orderItemCreateDtoList.stream().mapToInt(o -> o.getQuantity() * o.getUnitPrice()).sum();
         orderCreateDto.setTotalPrice(sum);
+        orderCreateDto.setIsCartOrder(false);
+
+        return orderCreateDto;
+    }
+
+    // 장바구니에서 주문 페이지 반환 시 orderCreateDto 준비
+    @Transactional(readOnly = true)
+    public OrderCreateDto prepareCartOrder(User user) {
+        Cart cart = cartRepository.findByUserId(user.getId()).orElseThrow(() -> new IllegalArgumentException("해당 회원의 장바구니가 존재하지 않습니다."));
+        List<Long> productIds = new ArrayList<>();
+        List<Integer> quantities = new ArrayList<>();
+
+        if (cart.getCartItems().size() == 0) {
+            throw new NotFoundOrderItemException("장바구니에 상품이 존재하지 않습니다.");
+        }
+
+        for (CartItem cartItem : cart.getCartItems()) {
+            productIds.add(cartItem.getProduct().getId());
+            quantities.add(cartItem.getQuantity());
+        }
+
+        List<OrderItemCreateDto> orderItemCreateDtoList = getOrderItemCreateDtoList(productIds, quantities);
+        OrderCreateDto orderCreateDto = new OrderCreateDto();
+        orderCreateDto.setOrderList(orderItemCreateDtoList);
+        orderCreateDto.setOrdererName(user.getName());
+        orderCreateDto.setOrdererPhoneNumber(user.getPhoneNumber());
+        int sum = orderItemCreateDtoList.stream().mapToInt(o -> o.getQuantity() * o.getUnitPrice()).sum();
+        orderCreateDto.setTotalPrice(sum);
+        orderCreateDto.setIsCartOrder(true);
 
         return orderCreateDto;
     }
@@ -133,6 +165,12 @@ public class OrderService {
         Set<Long> uniqueProductIds = new HashSet<>(productIds);
         if (productMap.size() != uniqueProductIds.size()) {
             throw new IllegalArgumentException("존재하지 않는 상품이 포함되어 있습니다.");
+        }
+
+        for (int i = 0; i < productIds.size(); i++) {
+            if (productMap.get(productIds.get(i)).getStock() < quantities.get(i)) {
+                throw new OutOfStockException("재고가 부족합니다.");
+            }
         }
 
         for (int i = 0; i < productIds.size(); i++) {
