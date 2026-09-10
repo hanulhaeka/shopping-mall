@@ -2,12 +2,9 @@ package com.seungjig.shoppingmall.order.controller;
 
 import com.seungjig.shoppingmall.global.security.CustomUserDetails;
 import com.seungjig.shoppingmall.order.entity.dto.OrderCreateDto;
-import com.seungjig.shoppingmall.order.entity.dto.OrderItemCreateDto;
 import com.seungjig.shoppingmall.order.exception.IncorrectPriceException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
 import com.seungjig.shoppingmall.order.service.OrderService;
-import com.seungjig.shoppingmall.product.service.ProductService;
-import com.seungjig.shoppingmall.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,8 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -52,6 +47,21 @@ public class OrderController {
 
     }
 
+    // 장바구니에서 주문 페이지 이동
+    @GetMapping("/create/cart")
+    public String createCartOrder(@AuthenticationPrincipal CustomUserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
+
+        try {
+            OrderCreateDto orderCreateDto = orderService.prepareCartOrder(userDetails.getUser());
+            model.addAttribute("orderCreateDto", orderCreateDto);
+            return "order/create";
+        } catch (OutOfStockException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/carts";
+        }
+
+    }
+
     // 주문 요청 처리
     @PostMapping("/create")
     public String createOrder(@Validated @ModelAttribute("orderCreateDto")OrderCreateDto orderCreateDto, BindingResult bindingResult,
@@ -78,7 +88,6 @@ public class OrderController {
         }
 
         try {
-            orderCreateDto.setIsCartOrder(false);
             orderService.createOrder(orderCreateDto, userDetails.getUser(), orderCreateDto.getIsCartOrder());
         } catch (IncorrectPriceException e) {
             bindingResult.reject("incorrectPrice", "금액에 문제가 있습니다.");

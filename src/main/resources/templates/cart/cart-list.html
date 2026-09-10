@@ -64,11 +64,17 @@
 
     <div class="d-flex flex-column justify-content-center align-items-center">
         <h4 class="mb-3 total-order-price-display" th:text="|총 주문 금액 : ${#numbers.formatInteger(totalOrderPrice ?: 0, 1, 'COMMA')}원|">총 주문 금액 : 0원</h4>
-        <a href="/orders" class="btn btn-primary btn-lg fw-semibold px-5 py-2 shadow-sm mb-3">
+        <a href="/orders/create/cart" class="btn btn-primary btn-lg fw-semibold px-5 py-2 shadow-sm mb-3">
             주문하기
         </a>
     </div>
 </div>
 <script th:src="@{/js/cart.js}"></script>
+<script th:inline="javascript">
+    const errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+</script>
 </body>
 </html>
