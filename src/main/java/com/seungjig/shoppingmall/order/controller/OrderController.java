@@ -106,8 +106,8 @@ public class OrderController {
     // 주문 목록 조회
     @GetMapping
     public String getOrderList(@AuthenticationPrincipal CustomUserDetails userDetails, Model model,
-                               @PageableDefault(size = 5, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        model.addAttribute("orderList", orderService.getOrderListDto(userDetails.getUser(), pageable));
+                               @PageableDefault(size = 4, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        model.addAttribute("page", orderService.getOrderListDto(userDetails.getUser(), pageable));
         return "order/list";
     }
 
