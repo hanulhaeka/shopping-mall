@@ -160,11 +160,12 @@ public class OrderService {
 
     private OrderListDto toOrderListDto(Order order) {
         OrderListDto dto = new OrderListDto();
+        dto.setOrderId(order.getId());
         dto.setMainProductName(order.getOrderItems().getFirst().getProductName());
         dto.setProductCount(order.getOrderItems().size());
         dto.setTotalPrice(order.getTotalPrice());
         dto.setOrderTime(order.getCreatedAt().toLocalDate());
-        dto.setMainProductImageUrl(order.getOrderItems().getFirst().getProduct().getImageHeadUrl());
+        dto.setMainProductImageUrl(FileService.PRODUCT_IMAGE_PREFIX + order.getOrderItems().getFirst().getProduct().getImageHeadUrl());
         return dto;
     }
 
