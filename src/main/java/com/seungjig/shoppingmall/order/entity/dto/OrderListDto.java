@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class OrderListDto {
+    private Long orderId;
     private String mainProductName;
     private Integer productCount;
     private Integer totalPrice;
