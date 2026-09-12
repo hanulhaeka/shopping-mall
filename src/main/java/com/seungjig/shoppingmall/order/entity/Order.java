@@ -53,7 +53,7 @@ public class Order extends BaseEntity {
     @Column(length = 30)
     private String recipientPhoneNumber;
 
-    @OneToMany(mappedBy = "orderItem")
+    @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
 
 }
