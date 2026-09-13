@@ -1,5 +1,6 @@
 package com.seungjig.shoppingmall.order.entity.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 public class OrderDetailDto {
     private String ordererName;
     private String ordererPhoneNumber;
