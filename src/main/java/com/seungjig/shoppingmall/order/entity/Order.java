@@ -5,6 +5,9 @@ import com.seungjig.shoppingmall.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="orders")
 @Getter
@@ -49,5 +52,8 @@ public class Order extends BaseEntity {
 
     @Column(length = 30)
     private String recipientPhoneNumber;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderItem> orderItems = new ArrayList<>();
 
 }

@@ -9,6 +9,7 @@ import com.seungjig.shoppingmall.order.entity.Order;
 import com.seungjig.shoppingmall.order.entity.OrderItem;
 import com.seungjig.shoppingmall.order.entity.dto.OrderCreateDto;
 import com.seungjig.shoppingmall.order.entity.dto.OrderItemCreateDto;
+import com.seungjig.shoppingmall.order.entity.dto.OrderListDto;
 import com.seungjig.shoppingmall.order.exception.IncorrectPriceException;
 import com.seungjig.shoppingmall.order.exception.NotFoundOrderItemException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
@@ -18,6 +19,8 @@ import com.seungjig.shoppingmall.product.entity.Product;
 import com.seungjig.shoppingmall.product.repository.ProductRepository;
 import com.seungjig.shoppingmall.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,6 +149,24 @@ public class OrderService {
         orderCreateDto.setIsCartOrder(true);
 
         return orderCreateDto;
+    }
+
+    // 주문 목록 dto 생성 반환
+    @Transactional(readOnly = true)
+    public Page<OrderListDto> getOrderListDto(User user, Pageable pageable) {
+        Page<Order> orders = orderRepository.findByUserId(user.getId(), pageable);
+        return orders.map(this::toOrderListDto);
+    }
+
+    private OrderListDto toOrderListDto(Order order) {
+        OrderListDto dto = new OrderListDto();
+        dto.setOrderId(order.getId());
+        dto.setMainProductName(order.getOrderItems().getFirst().getProductName());
+        dto.setProductCount(order.getOrderItems().size());
+        dto.setTotalPrice(order.getTotalPrice());
+        dto.setOrderTime(order.getCreatedAt().toLocalDate());
+        dto.setMainProductImageUrl(FileService.PRODUCT_IMAGE_PREFIX + order.getOrderItems().getFirst().getProduct().getImageHeadUrl());
+        return dto;
     }
 
     // 재고 확인

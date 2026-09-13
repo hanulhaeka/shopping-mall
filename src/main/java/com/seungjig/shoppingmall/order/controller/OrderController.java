@@ -6,6 +6,9 @@ import com.seungjig.shoppingmall.order.exception.IncorrectPriceException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
 import com.seungjig.shoppingmall.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -99,6 +102,15 @@ public class OrderController {
 
         return "redirect:/";
     }
+
+    // 주문 목록 조회
+    @GetMapping
+    public String getOrderList(@AuthenticationPrincipal CustomUserDetails userDetails, Model model,
+                               @PageableDefault(size = 4, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        model.addAttribute("page", orderService.getOrderListDto(userDetails.getUser(), pageable));
+        return "order/list";
+    }
+
 
     private boolean hasOrderItemBindingErrors(BindingResult bindingResult) {
         Set<String> targetFields = Set.of(

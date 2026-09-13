@@ -3,10 +3,7 @@ package com.seungjig.shoppingmall.order.entity;
 import com.seungjig.shoppingmall.global.entity.BaseEntity;
 import com.seungjig.shoppingmall.product.entity.Product;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(
@@ -18,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Getter
 public class OrderItem extends BaseEntity {
 
     @Id
