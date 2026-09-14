@@ -7,9 +7,7 @@ import com.seungjig.shoppingmall.cart.repository.CartRepository;
 import com.seungjig.shoppingmall.global.util.FileService;
 import com.seungjig.shoppingmall.order.entity.Order;
 import com.seungjig.shoppingmall.order.entity.OrderItem;
-import com.seungjig.shoppingmall.order.entity.dto.OrderCreateDto;
-import com.seungjig.shoppingmall.order.entity.dto.OrderItemCreateDto;
-import com.seungjig.shoppingmall.order.entity.dto.OrderListDto;
+import com.seungjig.shoppingmall.order.entity.dto.*;
 import com.seungjig.shoppingmall.order.exception.IncorrectPriceException;
 import com.seungjig.shoppingmall.order.exception.NotFoundOrderItemException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
@@ -167,6 +165,37 @@ public class OrderService {
         dto.setOrderTime(order.getCreatedAt().toLocalDate());
         dto.setMainProductImageUrl(FileService.PRODUCT_IMAGE_PREFIX + order.getOrderItems().getFirst().getProduct().getImageHeadUrl());
         return dto;
+    }
+
+    // 주문 상세 dto 반환
+    @Transactional(readOnly = true)
+    public OrderDetailDto getOrderDetailDto(Long orderId, Long userId) {
+        Order order = orderRepository.findOrderWithItemsAndProducts(orderId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("주문 정보가 없거나 올바른 접근이 아닙니다."));
+
+        List<OrderItemDetailDto> orderItemDetailDtos = order.getOrderItems().stream()
+                .map(orderItem -> OrderItemDetailDto.builder()
+                        .productName(orderItem.getProductName())
+                        .quantity(orderItem.getQuantity())
+                        .unitPrice(orderItem.getUnitPrice())
+                        .productImageUrl(FileService.PRODUCT_IMAGE_PREFIX + orderItem.getProduct().getImageHeadUrl())
+                        .build())
+                .toList();
+
+        OrderDetailDto orderDetailDto = OrderDetailDto.builder()
+                .ordererName(order.getOrdererName())
+                .ordererPhoneNumber(order.getOrdererPhoneNumber())
+                .totalPrice(order.getTotalPrice())
+                .orderDateTime(order.getCreatedAt())
+                .address(order.getAddress())
+                .addressDetail(order.getAddressDetail())
+                .postalCode(order.getPostalCode())
+                .recipientName(order.getRecipientName())
+                .recipientPhoneNumber(order.getRecipientPhoneNumber())
+                .orderItemDtos(orderItemDetailDtos)
+                .build();
+
+        return orderDetailDto;
     }
 
     // 재고 확인

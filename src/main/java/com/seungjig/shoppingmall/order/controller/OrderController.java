@@ -111,6 +111,13 @@ public class OrderController {
         return "order/list";
     }
 
+    // 주문 상세 조회
+    @GetMapping("/{orderId}")
+    public String getOrderDetail(@PathVariable Long orderId, @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        model.addAttribute("orderDetailDto", orderService.getOrderDetailDto(orderId, userDetails.getUserId()));
+        return "order/detail";
+    }
+
 
     private boolean hasOrderItemBindingErrors(BindingResult bindingResult) {
         Set<String> targetFields = Set.of(
