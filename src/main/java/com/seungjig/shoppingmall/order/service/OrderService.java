@@ -178,7 +178,7 @@ public class OrderService {
                         .productName(orderItem.getProductName())
                         .quantity(orderItem.getQuantity())
                         .unitPrice(orderItem.getUnitPrice())
-                        .productImageUrl(orderItem.getProduct().getImageHeadUrl())
+                        .productImageUrl(FileService.PRODUCT_IMAGE_PREFIX + orderItem.getProduct().getImageHeadUrl())
                         .build())
                 .toList();
 
