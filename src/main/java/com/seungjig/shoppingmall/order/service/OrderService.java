@@ -166,6 +166,7 @@ public class OrderService {
         dto.setTotalPrice(order.getTotalPrice());
         dto.setOrderTime(order.getCreatedAt().toLocalDate());
         dto.setMainProductImageUrl(FileService.PRODUCT_IMAGE_PREFIX + order.getOrderItems().getFirst().getProduct().getImageHeadUrl());
+        dto.setOrderStatus(order.getOrderStatus());
         return dto;
     }
 
@@ -185,6 +186,7 @@ public class OrderService {
                 .toList();
 
         OrderDetailDto orderDetailDto = OrderDetailDto.builder()
+                .orderId(order.getId())
                 .ordererName(order.getOrdererName())
                 .ordererPhoneNumber(order.getOrdererPhoneNumber())
                 .totalPrice(order.getTotalPrice())
@@ -195,6 +197,7 @@ public class OrderService {
                 .recipientName(order.getRecipientName())
                 .recipientPhoneNumber(order.getRecipientPhoneNumber())
                 .orderItemDtos(orderItemDetailDtos)
+                .orderStatus(order.getOrderStatus())
                 .build();
 
         return orderDetailDto;
