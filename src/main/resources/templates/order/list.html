@@ -49,7 +49,8 @@
 
                 <span th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd')}" class="text-secondary small"></span>
 
-                <div>
+                <div class="d-flex flex-column">
+                    <p  class="badge text-danger bg-danger-subtle border border-danger-subtle" th:if="${order.orderStatus.name() == 'CANCELED'}">취소 주문</p>
                     <a class="text-decoration-none text-reset" th:href="@{/orders/{id}(id=${order.orderId})}">주문 상세</a>
                 </div>
             </div>
