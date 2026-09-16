@@ -5,6 +5,7 @@ import com.seungjig.shoppingmall.order.entity.OrderItem;
 import com.seungjig.shoppingmall.order.entity.OrderStatus;
 import com.seungjig.shoppingmall.order.entity.dto.OrderCreateDto;
 import com.seungjig.shoppingmall.order.entity.dto.OrderItemCreateDto;
+import com.seungjig.shoppingmall.order.exception.CannotCancelOrderException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
 import com.seungjig.shoppingmall.order.repository.OrderItemRepository;
 import com.seungjig.shoppingmall.order.repository.OrderRepository;
@@ -203,5 +204,51 @@ public class OrderServiceIntegrationTest {
         //then
         long queryCount = statistics.getPrepareStatementCount();
         assertThat(queryCount).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("주문 취소를 두 번 연속으로 하면 두 번 째에 예외가 발생한다.")
+    void should_Exception_when_cancelOrder_twice() {
+        // given
+        User user = new User("loginId", "hashedPassword", "userName", "010-1234-5678", Role.USER, UserStatus.ACTIVE);
+        userRepository.save(user);
+
+        Product product = new Product("productName", 10000, 10, ProductStatus.ACTIVE);
+        product.setImageHeadUrl("imageHeadUrl");
+        productRepository.save(product);
+
+        Order order = Order.builder()
+                .user(user)
+                .totalPrice(product.getPrice())
+                .orderStatus(OrderStatus.ORDERED)
+                .address("address")
+                .addressDetail("addressDetail")
+                .postalCode("01234")
+                .ordererName(user.getName())
+                .ordererPhoneNumber("010-1234-1234")
+                .recipientName("recipientName")
+                .recipientPhoneNumber("010-1234-5678")
+                .build();
+
+        OrderItem orderItem = OrderItem.builder()
+                .order(order)
+                .product(product)
+                .quantity(1)
+                .unitPrice(product.getPrice())
+                .productName(product.getName())
+                .build();
+
+
+        orderRepository.save(order);
+        orderItemRepository.save(orderItem);
+
+        em.flush();
+        em.clear();
+
+        // when&then
+        orderService.cancelOrder(user, order.getId());
+        assertThatThrownBy(() -> orderService.cancelOrder(user, order.getId()))
+                .isInstanceOf(CannotCancelOrderException.class);
+
     }
 }

@@ -7,7 +7,9 @@ import com.seungjig.shoppingmall.cart.repository.CartRepository;
 import com.seungjig.shoppingmall.global.util.FileService;
 import com.seungjig.shoppingmall.order.entity.Order;
 import com.seungjig.shoppingmall.order.entity.OrderItem;
+import com.seungjig.shoppingmall.order.entity.OrderStatus;
 import com.seungjig.shoppingmall.order.entity.dto.*;
+import com.seungjig.shoppingmall.order.exception.CannotCancelOrderException;
 import com.seungjig.shoppingmall.order.exception.IncorrectPriceException;
 import com.seungjig.shoppingmall.order.exception.NotFoundOrderItemException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
@@ -164,6 +166,7 @@ public class OrderService {
         dto.setTotalPrice(order.getTotalPrice());
         dto.setOrderTime(order.getCreatedAt().toLocalDate());
         dto.setMainProductImageUrl(FileService.PRODUCT_IMAGE_PREFIX + order.getOrderItems().getFirst().getProduct().getImageHeadUrl());
+        dto.setOrderStatus(order.getOrderStatus());
         return dto;
     }
 
@@ -183,6 +186,7 @@ public class OrderService {
                 .toList();
 
         OrderDetailDto orderDetailDto = OrderDetailDto.builder()
+                .orderId(order.getId())
                 .ordererName(order.getOrdererName())
                 .ordererPhoneNumber(order.getOrdererPhoneNumber())
                 .totalPrice(order.getTotalPrice())
@@ -193,9 +197,29 @@ public class OrderService {
                 .recipientName(order.getRecipientName())
                 .recipientPhoneNumber(order.getRecipientPhoneNumber())
                 .orderItemDtos(orderItemDetailDtos)
+                .orderStatus(order.getOrderStatus())
                 .build();
 
         return orderDetailDto;
+    }
+
+    // 주문 취소
+    @Transactional
+    public void cancelOrder(User user, Long orderId) {
+        int updatedRows = orderRepository.updateOrderStatus(orderId, OrderStatus.ORDERED, OrderStatus.CANCELED, user.getId());
+
+        if (updatedRows == 0) {
+            throw new CannotCancelOrderException("취소할 수 없는 주문입니다.");
+        }
+
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+
+        // 데드락 방지
+        orderItems.sort(Comparator.comparing(item -> item.getProduct().getId()));
+
+        for (OrderItem item : orderItems) {
+            productRepository.restoreStock(item.getProduct().getId(), item.getQuantity());
+        }
     }
 
     // 재고 확인

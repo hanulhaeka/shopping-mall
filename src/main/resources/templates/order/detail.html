@@ -29,7 +29,14 @@
 
 <div class="d-flex flex-column justify-content-center align-items-center mb-5">
     <div class="w-50">
-        <h2>주문 상세</h2>
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>주문 상세</h2>
+            <form th:if="${orderDetailDto.orderStatus.name() == 'ORDERED'}" th:action="@{/orders/cancel/{orderId}(orderId=${orderDetailDto.orderId})}" method="post">
+                <button type="submit" class="btn btn-outline-danger btn-sm">주문 취소</button>
+            </form>
+            <p  class="badge text-danger bg-danger-subtle border border-danger-subtle" th:if="${orderDetailDto.orderStatus.name() == 'CANCELED'}">취소 주문</p>
+        </div>
+
         <hr class="border-1 border-dark opacity-100"/>
     </div>
 

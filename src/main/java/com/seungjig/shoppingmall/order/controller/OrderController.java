@@ -2,6 +2,7 @@ package com.seungjig.shoppingmall.order.controller;
 
 import com.seungjig.shoppingmall.global.security.CustomUserDetails;
 import com.seungjig.shoppingmall.order.entity.dto.OrderCreateDto;
+import com.seungjig.shoppingmall.order.exception.CannotCancelOrderException;
 import com.seungjig.shoppingmall.order.exception.IncorrectPriceException;
 import com.seungjig.shoppingmall.order.exception.OutOfStockException;
 import com.seungjig.shoppingmall.order.service.OrderService;
@@ -116,6 +117,17 @@ public class OrderController {
     public String getOrderDetail(@PathVariable Long orderId, @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         model.addAttribute("orderDetailDto", orderService.getOrderDetailDto(orderId, userDetails.getUserId()));
         return "order/detail";
+    }
+
+    // 주문 취소
+    @PostMapping("/cancel/{orderId}")
+    public String cancelOrder(@PathVariable Long orderId, @AuthenticationPrincipal CustomUserDetails userDetails, RedirectAttributes redirectAttributes) {
+        try {
+            orderService.cancelOrder(userDetails.getUser(), orderId);
+        } catch (CannotCancelOrderException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "주문 취소가 실패했습니다.");
+        }
+        return "redirect:/orders/" + orderId;
     }
 
 
