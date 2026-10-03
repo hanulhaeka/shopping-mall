@@ -138,4 +138,25 @@ public class AuthIntegrationTest {
                 .andExpect(redirectedUrl("/users/signin?error"));
     }
 
+    @Test
+    @DisplayName("로그인 시 회원의 username(로그인아이디)를 대문자로 전달하면 로그인 실패 및 로그인 페이지 리다이렉트")
+    void login_letter_case_failure() throws Exception {
+        //given
+        String loginId = "loginId";
+        String hashedPassword = passwordEncoder.encode("password");
+
+        User user = new User(loginId, hashedPassword,"name", "010-1234-5678", Role.USER, UserStatus.ACTIVE);
+        userRepository.save(user);
+
+        //when&then
+        mockMvc.perform(post("/users/signin")
+                        .with(csrf())
+                        .param("username", loginId.toUpperCase())
+                        .param("password", "password"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/signin?error"));
+
+    }
+
+
 }
